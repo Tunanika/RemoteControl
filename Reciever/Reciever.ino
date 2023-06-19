@@ -47,8 +47,6 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
     data_frame ControllerData = {};
     memcpy(&ControllerData, incomingData, len);
 
-    // Motor1PWM = map(ControllerData.pot1, 0, 4096, 1000, 2000);
-    // Motor2PWM = map(ControllerData.pot2, 0, 4096, 1000, 2000);
     Motor3PWM = map(ControllerData.pot3, 0, 4096, 1000, 2000);
 
     tempX = mapfloat(ControllerData.pot1, 0, 4096, -1, 1);
@@ -77,7 +75,7 @@ void loop()
     delay(1000);
     if (millis() - 100 > lastMsg)
     {
-        Serial.println("Holy Crappy");
+        Serial.println("Waited too long to recieve message");
         killAll();
     }
 }
@@ -88,7 +86,7 @@ void killAll()
     motor2.writeMicroseconds(1500);
     motor3.writeMicroseconds(1500);
     delay(500);
-    Serial.println("I BE DEAD!");
+    Serial.println("Restarting...");
     ESP.restart();
 }
 float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)

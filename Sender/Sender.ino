@@ -41,6 +41,9 @@ void setup()
     Serial.println(F("Initialized"));
     delay(800);
     tft.fillScreen(ST77XX_BLACK);
+    tft.setCursor(0, 0);
+    tft.setTextSize(2);
+    tft.print("Battery   Voltage: ");
 }
 
 char charVal[6];
@@ -51,26 +54,66 @@ struct data_frame
     int pot2;
     int pot3;
     int pot4;
+    bool sw1;
+    bool sw2;
+    bool sw3;
 };
 
 void loop()
 {
+    bool sw1 = digitalRead(12);
+    bool sw2 = digitalRead(14);
+    bool sw3 = digitalRead(26);
+
     data_frame data = {};
     data.pot1 = analogRead(32);
     data.pot2 = analogRead(33);
     data.pot3 = analogRead(34);
     data.pot4 = analogRead(35);
+    data.sw1 = sw1;
+    data.sw2 = sw2;
+    data.sw3 = sw3;
 
     vBat = (mapfloat(analogRead(36), 0, 4096, 0, 3.3) + 0.1) / 0.6875;
 
     Serial.println(analogRead(36));
     Serial.println("vBat: ");
     Serial.println(vBat);
-
-    tft.setCursor(0, 0);
-    tft.setTextSize(2);
-    tft.print("Battery   Voltage:  ");
+    tft.setCursor(0, 20);
     tft.print(dtostrf(vBat, 3, 1, charVal));
+
+    tft.setCursor(0, 30);
+    tft.print("Sw1: ");
+    if (sw1 == 1)
+    {
+        tft.print("Open");
+    }
+    else
+    {
+        tft.print("Closed");
+    }
+
+    tft.setCursor(0, 36);
+    tft.print("Sw2: ");
+    if (sw2 == 1)
+    {
+        tft.print("Open");
+    }
+    else
+    {
+        tft.print("Closed");
+    }
+
+    tft.setCursor(0, 42);
+    tft.print("Sw3: ");
+    if (sw3 == 1)
+    {
+        tft.print("Open");
+    }
+    else
+    {
+        tft.print("Closed");
+    }
 
     esp_now_send(receiver_mac, (uint8_t *)&data, sizeof(data));
     delay(60);
